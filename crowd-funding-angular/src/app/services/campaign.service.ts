@@ -30,6 +30,15 @@ export class CampaignService {
 
 
   // get campaign services
+  getTrendingCampaigns(){
+    return this.http.get(this.url+'get-trending-campaigns');
+  }
+  getNewestCampaigns(){
+    return this.http.get(this.url+'get-newest-campaigns');
+  }
+
+
+  //by category
   getNewestCampaignsByCategory(category){
     return this.http.get(this.url+'get-newest-campaigns-by-category/'+category);
   }

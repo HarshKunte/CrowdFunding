@@ -10,10 +10,23 @@ import { AuthService } from '../services/auth.service';
 })
 export class HomeComponent implements OnInit {
   
+  newestCampaigns=[];
+  trendingCampaigns=[];
   constructor(private authService:AuthService,public campaignService:CampaignService,private router:Router) { }
 
   ngOnInit() {
+
+    this.campaignService.getTrendingCampaigns()
+    .subscribe((data:any)=>{
+      this.trendingCampaigns=data;
+      // console.log(this.newestCampaigns);
+    });
     
+    this.campaignService.getNewestCampaigns()
+    .subscribe((data:any)=>{
+      this.newestCampaigns=data;
+      // console.log(this.newestCampaigns);
+    });
   }
 
   slideConfig = {
