@@ -10,7 +10,9 @@ import { AuthService } from '../services/auth.service';
 })
 export class CategoryComponent implements OnInit {
 
+  newestCampaignsByCat=[];
   newestCampaigns=[];
+  trendingCampaigns=[];
   cat;
 
   constructor(
@@ -24,8 +26,24 @@ export class CategoryComponent implements OnInit {
     this.cat=this.route.snapshot.paramMap.get("category");
     this.campaignService.getNewestCampaignsByCategory(this.route.snapshot.paramMap.get("category"))
     .subscribe((data:any)=>{
-      this.newestCampaigns=data;
+      this.newestCampaignsByCat=data;
       console.log(this.newestCampaigns);
+    });
+
+
+
+
+    //import other campaigns
+    this.campaignService.getTrendingCampaigns()
+    .subscribe((data:any)=>{
+      this.trendingCampaigns=data;
+      // console.log(this.newestCampaigns);
+    });
+    
+    this.campaignService.getNewestCampaigns()
+    .subscribe((data:any)=>{
+      this.newestCampaigns=data;
+      // console.log(this.newestCampaigns);
     });
 
   }

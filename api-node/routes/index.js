@@ -42,10 +42,10 @@ const upload = multer({
 // });
 
 //login
-router.post('/login', function (req, res, next) {
+router.post('/login', function (req, res) {
 
         let sql = "SELECT * from user where user_email = ? and password = ?";
-        db.query(sql, [req.body.email, req.body.password], (err, result, fields) => {
+        db.query(sql, [req.body.email, req.body.password], (err, result) => {
                 if (err) {
                         throw err;
                 }
@@ -163,10 +163,10 @@ router.post('/add-story', upload.fields([{
         , (req, res) => {
                 let postArray = {
                         campaign_id: req.body.campaign_id,
-                        image_1: req.files['image_1'][0].path,
-                        image_2: req.files['image_2'][0].path,
-                        image_3: req.files['image_3'][0].path,
-                        image_4: req.files['image_4'][0].path,
+                        image_1: 'http://localhost:3000/' + req.files['image_1'][0].path,
+                        image_2:'http://localhost:3000/' + req.files['image_2'][0].path,
+                        image_3:'http://localhost:3000/' + req.files['image_3'][0].path,
+                        image_4: 'http://localhost:3000/' +req.files['image_4'][0].path,
                         desc_1: req.body.desc_1,
                         desc_2: req.body.desc_2,
                         desc_3: req.body.desc_3,
@@ -352,9 +352,9 @@ router.get('/get-campaign-by-category/:cat', (req, res) => {
         });
 });
 
-router.get('/get-trending-campaigns/', (req, res) => {
+router.get('/get-trending-campaigns/', (req, res) => {  
         let sql = "SELECT * FROM campaign WHERE status!='failed' ORDER BY cam_no_backers DESC";
-        db.query(sql, (err, results) => {
+        db.query(sql, (err, results) => { 
                 if (err) throw err;
                 console.log(results);
                 res.send(results);
@@ -366,7 +366,7 @@ router.get('/get-newest-campaigns', (req, res) => {
         db.query(sql, (err, result) => {
                 if (err) throw err;
                 console.log(result);
-                res.send('latest campaigns fetched...');
+                res.send(result);
                 
         });
 });
