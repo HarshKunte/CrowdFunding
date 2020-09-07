@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
                 cb(null, './uploads/');
         },
         filename: function (req, file, cb) {
-                cb(null, new Date().toISOString() + file.originalname);
+                cb(null, new Date().toISOString().replace(/:/g, '_') + file.originalname);
         }
 });
 
@@ -52,36 +52,36 @@ router.post('/login', function (req, res, next) {
                 else {
                         console.log(req.body);
                         console.log(result);
-                        console.log(result.length); 
+                        console.log(result.length);
                         if (result.length > 0) {
                                 // generate token
-                                
+
                                 let token = jwt.sign({ username: result[0].user_id }, 'secret', { expiresIn: '3h' });
                                 res.send({ status: '1', jwtToken: token });
-                                
-                                console.log("token is "+token);
-                                 console.log('lol');
- 
+
+                                console.log("token is " + token);
+                                console.log('lol');
+
                         }
                         else {
-                                res.send({ status: '0' }); 
-                        } 
+                                res.send({ status: '0' });
+                        }
                 }
         });
 });
 
 //register
-router.post('/register', (req, res) => { 
+router.post('/register', (req, res) => {
         let sql = "INSERT INTO user SET ?";
         db.query(sql, req.body, (err, result) => {
                 if (err) throw err;
                 if (result.affectedRows > 0) {
-                         // generate token
-                         let token = jwt.sign({ username: result.insertId }, 'secret', { expiresIn: '3h' });
-                         res.send({ status: "1", jwtToken: token });           
+                        // generate token
+                        let token = jwt.sign({ username: result.insertId }, 'secret', { expiresIn: '3h' });
+                        res.send({ status: "1", jwtToken: token });
                 }
-                else{
-                        res.send({status:"0"});
+                else {
+                        res.send({ status: "0" });
                 }
         });
 });
@@ -131,8 +131,8 @@ router.post('/create-campaign', (req, res) => {
 router.post('/add-faq', (req, res) => {
         let sql = "INSERT INTO faq_campaign SET ?";
         db.query(sql, req.body, (err, result) => {
-                if (err) throw err; 
-                console.log(result); 
+                if (err) throw err;
+                console.log(result);
                 res.send(result);
         });
 });
@@ -204,15 +204,15 @@ router.post('/pledge', (req, res) => {
                 if (err) throw err;
                 console.log(result);
                 if (result.affectedRows > 0) {
-                        console.log("rewardsamt"+req.body.rewards_amount);
+                        console.log("rewardsamt" + req.body.rewards_amount);
                         // increase number of backers and add total amount
-                        sql="UPDATE campaign SET cam_no_backers = cam_no_backers + 1, total_amount = total_amount +"+req.body.rewards_amount+" WHERE campaign_id="+req.body.funds.campaign_id;
-                        db.query(sql, (err, result)=>{
-                                if(err) throw err;
+                        sql = "UPDATE campaign SET cam_no_backers = cam_no_backers + 1, total_amount = total_amount +" + req.body.rewards_amount + " WHERE campaign_id=" + req.body.funds.campaign_id;
+                        db.query(sql, (err, result) => {
+                                if (err) throw err;
                                 console.log(result);
                                 res.send({ status: "1" });
                         });
-                        
+
                 }
                 else {
                         res.send({ status: "0" });
@@ -270,7 +270,7 @@ router.get('/get-campaign-by-id/:id', (req, res) => {
                 var date1 = new Date(results[0].cam_reg_date);
                 var date2 = new Date();
                 var diffDays = parseInt((date2 - date1) / (1000 * 60 * 60 * 24));
-                
+
 
 
                 // to get due date
@@ -284,15 +284,15 @@ router.get('/get-campaign-by-id/:id', (req, res) => {
 
 
                 // get comments 
-                
 
-                sql = "SELECT c.*, u.user_name FROM comments c INNER JOIN user u ON c.user_id = u.user_id WHERE c.campaign_id="+req.params.id+ " ORDER BY c.timestamp DESC";
+
+                sql = "SELECT c.*, u.user_name FROM comments c INNER JOIN user u ON c.user_id = u.user_id WHERE c.campaign_id=" + req.params.id + " ORDER BY c.timestamp DESC";
                 db.query(sql, (err, results) => {
                         if (err) throw err;
                         console.log(results);
                         let comments = results;
-        
-                        
+
+
 
                         // get faq 
                         sql = "SELECT * FROM faq_campaign WHERE campaign_id = " + req.params.id;
@@ -326,7 +326,7 @@ router.get('/get-campaign-by-id/:id', (req, res) => {
                                                 // console.log(campaign, comments, days_to_go);
                                                 res.send({
                                                         "campaign": campaign, "comments": comments, "faqs": faqs, "story": story,
-                                                        "days_to_go": diffDays, "rewards" : rewards
+                                                        "days_to_go": diffDays, "rewards": rewards
                                                 });
                                         });
 
@@ -367,7 +367,7 @@ router.get('/get-newest-campaigns', (req, res) => {
                 if (err) throw err;
                 console.log(result);
                 res.send('latest campaigns fetched...');
-                
+
         });
 });
 // popular by cat
@@ -404,17 +404,17 @@ router.get('/get-rewards/:campaign_id', (req, res) => {
         let sql = 'SELECT * FROM rewards where campaign_id = ?';
         db.query(sql, campaign_id, (err, results) => {
                 if (err) throw err;
-                console.log(results); 
+                console.log(results);
                 res.send('rewards fetched...');
         });
 });
 
 //manage campaings
- router.get('/manage-campaigns/:user_id', (req, res) => {
-        let sql = "SELECT funds.*,user.user_email, rewards.rewards_sub, campaign.cam_title FROM funds INNER JOIN rewards ON rewards.rewards_id = funds.rewards_id INNER JOIN user ON user.user_id = funds.backer_id INNER JOIN campaign ON campaign.campaign_id = funds.campaign_id WHERE funds.campaign_id IN (SELECT campaign_id FROM campaign WHERE user_id="+req.params.user_id+")";
+router.get('/manage-campaigns/:user_id', (req, res) => {
+        let sql = "SELECT funds.*,user.user_email, rewards.rewards_sub, campaign.cam_title FROM funds INNER JOIN rewards ON rewards.rewards_id = funds.rewards_id INNER JOIN user ON user.user_id = funds.backer_id INNER JOIN campaign ON campaign.campaign_id = funds.campaign_id WHERE funds.campaign_id IN (SELECT campaign_id FROM campaign WHERE user_id=" + req.params.user_id + ")";
         db.query(sql, (err, results) => {
                 if (err) throw err;
-                console.log(results);  
+                console.log(results);
                 res.send(results);
         });
 });
@@ -424,58 +424,58 @@ router.get('/get-rewards/:campaign_id', (req, res) => {
 
 
 //to get name and email on profile
-router.get('/:id',function(req,res){
-        db.query('select user_name,user_email,profile_img from user where user_id=?',[req.params.id],function(error,result){
-           if (error) throw error;
-           res.send(result)
-           
-           //console.log(result);
+router.get('/:id', function (req, res) {
+        db.query('select user_name,user_email,profile_img from user where user_id=?', [req.params.id], function (error, result) {
+                if (error) throw error;
+                res.send(result)
+
+                //console.log(result);
         });
-    });
-    //to get about info
-    router.get('/:id/about',function(req,res){
-      db.query('select user_name,user_email,user_phone,website,bio,location from user where user_id=?',[req.params.id],function(error,result){
-        if (error) throw error;
-        res.send(result)
-    });
-    });
-    
-    //update about info of user
-    router.put('/:id/about',function(req,res){
-      db.query('update user set user_name=?,user_email=?,user_phone=?,website=?,bio=?,location=? where user_id=?',
-      [req.body.user_name, req.body.user_email, req.body.user_phone, req.body.website, req.body.bio,req.body.location, req.params.id],
-      function(error,result,fields){
-        if (error) throw error;
-        res.end(JSON.stringify(result));
-      })
-    });
-    
-    //get backed projects of user
-    router.get('/:id/backed',function(req,res){
-      let sql ="select campaign.cam_title,campaign.cam_subject,funds.funds_id from funds INNER JOIN campaign ON funds.campaign_id = campaign.campaign_id where funds.backer_id =?";
-      db.query(sql,[req.params.id],function(error,result,fields){
-        if (error) throw error;
-        res.send(result);
-      });
-    });
-    
-    //get details of campaign
-    router.get('/:id/backed/details/:fundsid',function(req,res){
-      let sql ="select c.cam_title,c.cam_subject,c.cam_desc,f.amount,f.funds_date,r.rewards_desc from funds f INNER JOIN campaign c ON f.campaign_id = c.campaign_id INNER JOIN rewards r ON f.rewards_id=r.rewards_id  where f.funds_id=?";
-       db.query(sql,[req.params.fundsid],function(error,result){
-         if(error) throw error;
-         res.send(result);
-       });
-    });
-    
-    //get myprojects from profile
-    router.get('/:id/myprojects',function(req,res){
-      let sql="select c.campaign_id,c.cam_title,c.cam_subject from campaign c where c.user_id=?";
-      db.query(sql,[req.params.id],function(error,result){
-        if(error) throw error;
-        res.send(result);
-      });
-    });
+});
+//to get about info
+router.get('/:id/about', function (req, res) {
+        db.query('select user_name,user_email,user_phone,website,bio,location from user where user_id=?', [req.params.id], function (error, result) {
+                if (error) throw error;
+                res.send(result)
+        });
+});
+
+//update about info of user
+router.put('/:id/about', function (req, res) {
+        db.query('update user set user_name=?,user_email=?,user_phone=?,website=?,bio=?,location=? where user_id=?',
+                [req.body.user_name, req.body.user_email, req.body.user_phone, req.body.website, req.body.bio, req.body.location, req.params.id],
+                function (error, result, fields) {
+                        if (error) throw error;
+                        res.end(JSON.stringify(result));
+                })
+});
+
+//get backed projects of user
+router.get('/:id/backed', function (req, res) {
+        let sql = "select campaign.cam_title,campaign.cam_subject,funds.funds_id from funds INNER JOIN campaign ON funds.campaign_id = campaign.campaign_id where funds.backer_id =?";
+        db.query(sql, [req.params.id], function (error, result, fields) {
+                if (error) throw error;
+                res.send(result);
+        });
+});
+
+//get details of campaign
+router.get('/:id/backed/details/:fundsid', function (req, res) {
+        let sql = "select c.cam_title,c.cam_subject,c.cam_desc,f.amount,f.funds_date,r.rewards_desc from funds f INNER JOIN campaign c ON f.campaign_id = c.campaign_id INNER JOIN rewards r ON f.rewards_id=r.rewards_id  where f.funds_id=?";
+        db.query(sql, [req.params.fundsid], function (error, result) {
+                if (error) throw error;
+                res.send(result);
+        });
+});
+
+//get myprojects from profile
+router.get('/:id/myprojects', function (req, res) {
+        let sql = "select c.campaign_id,c.cam_title,c.cam_subject from campaign c where c.user_id=?";
+        db.query(sql, [req.params.id], function (error, result) {
+                if (error) throw error;
+                res.send(result);
+        });
+});
 
 // // login
 // router.post('/register', (req, res) => {
