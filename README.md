@@ -1,4 +1,6 @@
-# Preview
+#Crowd funding portal
+
+## Website Preview
 
 <img src= "screens/home.png">
 
